@@ -3,6 +3,33 @@ disk_free_frankie
 
 Calls to df and trims the output cleaning uuid and mapper from device
 
+SYNOPSIS
+
+    With LVM and uuid devices, using df can be a pain:
+
+        $ df
+        Filesystem                                             1K-blocks     Used 
+            Available Use% Mounted on
+        rootfs                                                   3842376  1493404
+            2153784  41% /
+        udev                                                       10240        0
+            10240   0% /dev
+        tmpfs                                                     103384      204
+            103180   1% /run
+        /dev/disk/by-uuid/6832e4f5-a260-4f25-b376-7d7175bce2a9   3842376  1493404
+            2153784  41% /
+    
+    dff just calls df and trims the device part to make the output 
+    human readable again.
+
+        $ dff.pl
+        Filesystem    1K-blocks      Used  Available  Use% Mounted on
+        rootfs          3842376   1493404    2153784   41% /
+        udev              10240         0      10240    0% /dev
+        tmpfs            103384       204     103180    1% /run
+        uuid/6832e4f    3842376   1493404    2153784   41% /
+    
+
 REQUIREMENTS
 
     IPC::Run Perl Module.
