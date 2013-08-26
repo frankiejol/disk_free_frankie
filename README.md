@@ -59,6 +59,10 @@ USAGE
 
         alias df=dff.pl
 
+    Even cleaner output:
+
+        alias df=dff.pl -hP
+
     dff own arguments
 
         If you use it as an alias, maybe one day you will need the real thing:
