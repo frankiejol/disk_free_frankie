@@ -30,9 +30,9 @@ my $VERSION = "0.02";
 my $LENGTH_DEV = 18;
 
 my $NO_TRIM;
-if ($ARGV[0] && $ARGV[0] eq '--real') {
+if ($ARGV[0] && $ARGV[0] =~ /--(help|real)$/) {
         $NO_TRIM = 1;
-        shift @ARGV;
+        shift @ARGV if $ARGV[0] eq '--real';
 } elsif ($ARGV[0] && $ARGV[0] =~ /--length=(\d+)$/) {
         $LENGTH_DEV= $1;
         shift @ARGV;
@@ -47,7 +47,8 @@ sub trim {
 	$dev .= " " x (32-length($dev));
 	$dev =~ s!.*(uuid/.*)!$1!;
 	$dev =~ s!.*(mapper/).*?-(.)!$1$2!;
-	$dev = substr($dev,0,$LENGTH_DEV);
+    $dev =~ s!(.*?:).*/(.*)!$1$2!;
+	$dev = substr("$dev     ",0,$LENGTH_DEV);
 
     return $dev;
 
@@ -60,6 +61,11 @@ $ENV{LANG}='C';
 my @cmd = ('df',@ARGV);
 
 run \@cmd,\$in,\$out,\$err, timeout(10) or die $err;
+
+if ($NO_TRIM) {
+    print $out;
+    exit;
+}
 
 my @length;
 my @out;
