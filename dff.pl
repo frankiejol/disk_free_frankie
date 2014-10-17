@@ -21,6 +21,7 @@
 use warnings;
 use strict;
 
+use Getopt::Long;
 use IPC::Run qw(run timeout);
 
 my $VERSION = "0.02";
@@ -28,14 +29,16 @@ my $VERSION = "0.02";
 # 0.02 : --real and --length args
 
 my $LENGTH_DEV = 18;
+my ($NO_TRIM, $HELP, $EXPORT);
 
-my $NO_TRIM;
-if ($ARGV[0] && $ARGV[0] =~ /--(help|real)$/) {
-        $NO_TRIM = 1;
-        shift @ARGV if $ARGV[0] eq '--real';
-} elsif ($ARGV[0] && $ARGV[0] =~ /--length=(\d+)$/) {
-        $LENGTH_DEV= $1;
-        shift @ARGV;
+GetOptions(        help => \$HELP
+                  ,real => \$NO_TRIM
+                ,export => \$EXPORT
+            ,'length=s' => \$LENGTH_DEV
+);
+if ($HELP) {
+    print "$0 [--help] [--export] [--real] [--length=$LENGTH_DEV]\n";
+    exit;
 }
 
 ###########################################################################
@@ -58,6 +61,8 @@ sub trim {
 my ($in,$out,$err) = ();
 
 $ENV{LANG}='C';
+push @ARGV,('-h')   if !$NO_TRIM;
+
 my @cmd = ('df',@ARGV);
 
 run \@cmd,\$in,\$out,\$err, timeout(10) or die $err;
@@ -71,6 +76,7 @@ my @length;
 my @out;
 for (split m{\n},$out) {
 	my @items = split ;
+    next if $items[-1] =~ m{^/export/};
 
 	$items[0] = trim($items[0]);
 
